@@ -33,10 +33,23 @@ console.log(
 );
 
 if (!suggestions || suggestions.success === false) {
+  const errorMessage = suggestions?.error?.toLowerCase() || "";
+
+  if (
+    errorMessage.includes("high demand") ||
+    errorMessage.includes("quota") ||
+    errorMessage.includes("rate limit")
+  ) {
+    return res.status(503).json({
+      success: false,
+      error:
+        "Our AI service is currently experiencing high demand. Please try again after 10 minutes."
+    });
+  }
+
   return res.status(500).json({
     success: false,
-    error: suggestions.error || "Gemini analysis failed",
-    raw_model_output: suggestions.raw_model_output
+    error: suggestions?.error || "Unable to analyze the resume at the moment."
   });
 }
 
